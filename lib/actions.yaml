@@ -1,0 +1,82 @@
+actions:
+  start: &start
+    - text: hey, politics got you down?
+      buttons:
+        - text: yup
+      default_next_intent: no_results
+  default: *start
+  no_results:
+    - text: congress not getting results?
+      buttons:
+        - text: hell yes!
+      default_next_intent: factoid
+  factoid:
+    - text: did you know that a small number of special interests spend billions of dollars every year to influence politicians?
+      buttons:
+        - text: wow.
+      default_next_intent: follow_the_money
+  follow_the_money:
+    - text: let's follow the money.
+    - image: 'https://thechive.files.wordpress.com/2015/09/theres-a-lot-of-tiny-text-hiding-on-your-dollar-bills-15-photos-6.jpg?quality=85&strip=info&w=600'
+    - text: which issue do you care about most?
+      buttons:
+        - text: gun control
+          postback:
+            issue: gun_control
+        - text: health care
+          postback:
+            issue: health_care
+        - text: environment
+          postback:
+            issue: environment
+      default_next_intent: record_issue
+  select_location:
+    - text: let's do something about it!
+    - text: let's start with where you are
+      buttons:
+        - type: location
+      default_next_intent: record_location
+  reenter_location:
+    - text: let's try that again!
+      buttons:
+        - type: location
+      default_next_intent: record_location
+  show_politicians:
+    - text: these are the politicians that represent you.
+    - type: template
+      cards:
+        {{#politicians}}
+          - image: {{image}}
+            title: {{name}} ({{party}})
+            subtitle: {{office}}
+            buttons:
+              - text: learn more
+                postback:
+                  pol_idx: {{idx}}
+                  intent: learn_more
+        {{/politicians}}
+  learn_more:
+    - text: let's find out the money that {{politician_name}} has received to influence their support for {{issue_name}}
+    {{#factoids}}
+    - text: {{text}}
+    {{/factoids}}
+    - text: '{{exit_text}}'
+      buttons:
+        - text: '{{exit_button}}'
+      default_next_intent: '{{next_intent}}'
+  good_pol_followup:
+    - text: you can still make an impact though!
+    - type: buttons
+      text: find a swing district to support
+      buttons:
+        - text: act now
+          url: https://swingleft.org/
+  bad_pol_folloup:
+    - text: one of the most effective ways to influence your politician (without a boatload of money) is to call them
+      type: buttons
+      buttons:
+        - text: too hard.
+        - text: okay, what else?
+        - phone: '{{politican_number}}'
+          type: call
+          text: call
